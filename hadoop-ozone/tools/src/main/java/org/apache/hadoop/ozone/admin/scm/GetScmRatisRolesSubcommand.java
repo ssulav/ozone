@@ -19,6 +19,7 @@ package org.apache.hadoop.ozone.admin.scm;
 
 import java.io.IOException;
 import java.util.List;
+import org.apache.hadoop.hdds.server.JsonUtils;
 import org.apache.hadoop.hdds.cli.HddsVersionProvider;
 import org.apache.hadoop.hdds.scm.cli.ScmSubcommand;
 import org.apache.hadoop.hdds.scm.client.ScmClient;
@@ -35,14 +36,26 @@ import picocli.CommandLine;
     versionProvider = HddsVersionProvider.class)
 public class GetScmRatisRolesSubcommand extends ScmSubcommand {
 
+  @CommandLine.Option(names = { "--json" },
+          defaultValue = "false",
+          description = "Format output as JSON")
+  private boolean json;
+
   @CommandLine.ParentCommand
   private ScmAdmin parent;
 
   @Override
   protected void execute(ScmClient scmClient) throws IOException {
     List<String> roles = scmClient.getScmRatisRoles();
-    for (String role: roles) {
-      System.out.println(role);
+    if (json) {
+//      List<Pipeline> scmRolesList = roles.collect(Collectors.toList());
+      System.out.print(
+              JsonUtils.toJsonStringWithDefaultPrettyPrinter(roles));
+    } else {
+      for (String role: roles) {
+        System.out.println(role);
+      }
     }
   }
 }
+
